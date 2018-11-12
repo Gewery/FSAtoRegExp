@@ -1,7 +1,7 @@
 import sys
 
 sys.stdin = open('fsa.txt')
-# sys.stdout = open('result.txt', 'w')
+sys.stdout = open('result.txt', 'w')
 
 Errors = []
 
@@ -130,7 +130,6 @@ for t in trans:
     if b not in TE:
         TE[b] = {}
 
-
     add_to_R('-1', states[a], states[b], al)
 
     E[a][al] = b
@@ -160,7 +159,7 @@ if len(Errors) != 0:
     exit(0)
 
 if len(fin) == 0:
-    print('{}')
+    print('{}', end='')
     exit(0)
 
 dfs2(states.index(init[0]))
@@ -193,6 +192,6 @@ ans = ''
 for s in fin:
     ans += R[states[-1]][init[0]][s] + '|'
 
-print(ans[:-1])
+print(ans[:-1], end='')
 
 sys.stdout.close()
