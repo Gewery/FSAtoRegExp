@@ -1,9 +1,10 @@
 import sys
 
 sys.stdin = open('fsa.txt')
-#sys.stdout = open('result.txt', 'w')
+# sys.stdout = open('result.txt', 'w')
 
 Errors = []
+
 
 def add_error(e, p=''):
     if e == 1:
@@ -91,8 +92,11 @@ for i in states + alpha:
             add_error(5)
             break
 
-if len(init) == 0: add_error(4)
-elif fin[0] not in states:
+
+if len(init) == 0:
+    add_error(4)
+
+if len(fin) != 0 and fin[0] not in states:
     add_error(1, fin[0])
 
 used = [False] * len(states)
@@ -126,7 +130,8 @@ for t in trans:
     if b not in TE:
         TE[b] = {}
 
-    add_to_R('-1', a, b, al)
+
+    add_to_R('-1', states[a], states[b], al)
 
     E[a][al] = b
     TE[b][al] = a
@@ -154,18 +159,23 @@ if len(Errors) != 0:
     sys.stdout.close()
     exit(0)
 
+if len(fin) == 0:
+    print('{}')
+    exit(0)
+
 dfs2(states.index(init[0]))
 
-
-for k in states:
+for k in states + ['-1']:
     for i in states:
         for j in states:
             if k not in R or i not in R[k] or j not in R[k][i]:
                 add_to_R(k, i, j, '{}')
-            else:
-                R[k][i][j] = '(' + R[k][i][j] + ')'
+            elif i == j:
+                add_to_R(k, i, j, 'eps')
 
 for ind_k in range(len(states)):
+    k = states[ind_k]
+    R[k] = {}
     for i in states:
         for j in states:
             prev_k = ''
@@ -173,10 +183,10 @@ for ind_k in range(len(states)):
                 prev_k = '-1'
             else:
                 prev_k = states[ind_k - 1]
-            k = states[ind_k]
-            print(prev_k, k, i, j)
-            print(R)
-            R[k][i][j] = R[prev_k][i][k] + '(' + R[prev_k][k][k] + ')*' + R[prev_k][k][j] + '|' + R[prev_k][i][j] # TODO: Improve it
+            if i not in R[k]:
+                R[k][i] = {}
+            R[k][i][j] = '(' + R[prev_k][i][k] + ')' + '(' + R[prev_k][k][k] + ')*(' + R[prev_k][k][j] + ')|(' + \
+                         R[prev_k][i][j] + ')'  # TODO: Improve it
 
 ans = ''
 
@@ -184,6 +194,5 @@ for s in fin:
     ans += R[states[-1]][init[0]][s] + '|'
 
 print(ans[:-1])
-
 
 sys.stdout.close()
