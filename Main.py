@@ -167,10 +167,10 @@ dfs2(states.index(init[0]))
 for k in states + ['-1']:
     for i in states:
         for j in states:
+            if i == j:
+                add_to_R(k, i, j, 'eps')
             if k not in R or i not in R[k] or j not in R[k][i]:
                 add_to_R(k, i, j, '{}')
-            elif i == j:
-                add_to_R(k, i, j, 'eps')
 
 for ind_k in range(len(states)):
     k = states[ind_k]
